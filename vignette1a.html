@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tiwala Vignette — Suspicious Situation</title>
+
+<!--
+  ============================================================
+  TIWALA VIGNETTE — 4 OPTION FLIP CARDS  (square 2x2 layout)
+  ============================================================
+
+  PALETTE (from the brand swatch)
+    #FEFB6E  yellow    |  #FEAC74  peach
+    #C1F4FD  cyan      |  #B0A3FF  lavender
+    #3C3E24  olive     |  #492115  brown
+    #FFE5D6  cream
+
+  ROLE ASSIGNMENT
+    page background .... cream
+    card fronts ....... cyan / yellow / peach / lavender (one each)
+    card backs ........ olive  (incorrect options)
+                        brown  (correct option)
+    rules & accents ... peach
+    correct badge ..... yellow with olive text
+
+  TEXT ALIGNMENT
+    Every card front: the option tag sits centred at the top, and the
+    option wording is centred horizontally AND vertically in the square.
+    Card backs follow the same rule (badge top-centre, feedback centred).
+
+  EDIT POINTS (three, all marked "EDIT ME"): VIGNETTE, CARDS, and the
+  palette in the :root block.
+
+  No internet, no fonts, no libraries: renders identically offline and
+  inside an H5P Iframe Embedder in Lumi.
+  ============================================================
+-->
+
+<style>
+  /* ---------- PALETTE ---------- */
+  :root{
+    --yellow:   #FEFB6E;
+    --peach:    #FEAC74;
+    --cyan:     #C1F4FD;
+    --lavender: #B0A3FF;
+    --olive:    #3C3E24;
+    --brown:    #492115;
+    --cream:    #FFE5D6;
+
+    --ink:        var(--brown);
+    --ink-soft:   rgba(73,33,21,.72);
+    --line:       rgba(73,33,21,.18);
+    --radius:     6px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:30px 20px 44px; }
+
+  /* ---------------- Header ---------------- */
+  .eyebrow{
+    font-size:11px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--brown); font-weight:700; margin:0 0 6px; opacity:.85;
+  }
+
+  h1{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(21px, 3vw, 28px); font-weight:600;
+    letter-spacing:-.01em; color:var(--brown); margin:0;
+  }
+
+  .rule{ height:3px; background:var(--peach); margin:16px 0 22px; border-radius:2px; }
+
+  /* ---------------- Intro ---------------- */
+  .intro p{
+    margin:0 0 12px; font-size:15px;
+    color:var(--ink-soft); line-height:1.65;
+  }
+
+  .instruction{
+    font-size:14px !important; font-weight:700;
+    color:var(--brown) !important; letter-spacing:.01em;
+    margin-top:16px !important;
+  }
+
+  /* ---------------- Situation panel ---------------- */
+  .situation{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--peach);
+    border-radius:var(--radius);
+    padding:20px 22px; margin:20px 0 22px;
+  }
+
+  .situation .tag{
+    font-size:10.5px; font-weight:700; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--brown); opacity:.8; margin:0 0 10px;
+  }
+
+  .situation p{ margin:0; font-size:15px; line-height:1.65; color:var(--brown); }
+
+  /* ---------------- Toolbar ---------------- */
+  .toolbar{
+    display:flex; flex-wrap:wrap; align-items:center;
+    gap:10px; margin:0 0 18px;
+  }
+
+  button{
+    font:inherit; font-size:13px; font-weight:700; letter-spacing:.02em;
+    padding:8px 15px; border-radius:4px;
+    border:1px solid var(--brown); background:var(--brown);
+    color:var(--cream); cursor:pointer;
+    transition:background .16s ease, border-color .16s ease, opacity .16s ease, color .16s ease;
+  }
+
+  button:hover{ background:var(--olive); border-color:var(--olive); }
+  button:active{ transform:translateY(1px); }
+
+  button.ghost{ background:transparent; color:var(--brown); }
+  button.ghost:hover{ background:rgba(73,33,21,.07); border-color:var(--brown); }
+
+  button:focus-visible, .card:focus-visible{
+    outline:3px solid rgba(176,163,255,.75); outline-offset:3px;
+  }
+
+  .counter{
+    margin-left:auto; font-size:12px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--ink-soft);
+    font-variant-numeric:tabular-nums; font-weight:600;
+  }
+
+  /* ---------------- SQUARE GRID ---------------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:20px;
+    align-items:stretch;
+  }
+
+  /* 1 / 1 = square. Try 5/4 for slightly tall cards if you add longer text. */
+  .card{
+    position:relative; display:block; width:100%;
+    aspect-ratio:1 / 1;
+    min-height:300px;
+    padding:0; border:none; background:none;
+    perspective:1600px; cursor:pointer; text-align:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .inner{
+    position:relative; display:block; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.4,.1,.2,1);
+  }
+
+  .card[aria-pressed="true"] .inner{ transform:rotateY(180deg); }
+
+  .face{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;   /* vertical + horizontal centre */
+    text-align:center;
+    padding:58px 24px 28px;                       /* top padding clears the tag */
+    border-radius:var(--radius);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    overflow:auto;
+  }
+
+  /* --- Fronts: one pastel per card --- */
+  .face.front{
+    border:1px solid rgba(73,33,21,.16);
+    box-shadow:0 1px 2px rgba(73,33,21,.08), 0 10px 22px -18px rgba(73,33,21,.45);
+  }
+
+  .card:nth-child(1) .face.front{ background:var(--cyan); }
+  .card:nth-child(2) .face.front{ background:var(--yellow); }
+  .card:nth-child(3) .face.front{ background:var(--peach); }
+  .card:nth-child(4) .face.front{ background:var(--lavender); }
+
+  /* --- Backs: dark anchor colours --- */
+  .face.back{
+    background:var(--olive);
+    border:1px solid var(--olive);
+    color:var(--cream);
+    transform:rotateY(180deg);
+    box-shadow:0 1px 2px rgba(73,33,21,.14), 0 12px 26px -18px rgba(73,33,21,.6);
+  }
+
+  .card[data-verdict="correct"] .face.back{
+    background:var(--brown);
+    border-color:var(--brown);
+  }
+
+  /* peach hairline across the top of the answer faces */
+  .face.back::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--peach);
+    border-radius:var(--radius) var(--radius) 0 0;
+  }
+
+  /* ---------------- Tag, top-centre on both faces ---------------- */
+  .tag{
+    position:absolute; top:22px; left:0; right:0;
+    text-align:center;
+    font-size:10px; font-weight:800; letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--brown); opacity:.8;
+    margin:0;
+  }
+
+  .face.back .tag{ color:var(--peach); opacity:1; }
+
+  /* ---------------- Front wording ---------------- */
+  .option{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(15px, 1.6vw, 17.5px);
+    line-height:1.5; font-weight:600; color:var(--brown);
+    margin:0; max-width:34ch;
+  }
+
+  .hint{
+    position:absolute; right:0; left:0; bottom:16px;
+    text-align:center;
+    font-size:9.5px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--brown); opacity:.55; font-weight:700;
+  }
+
+  /* ---------------- Verdict badge, top-centre ---------------- */
+  .verdict{
+    position:absolute; top:18px; left:50%; transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:10px; font-weight:800; letter-spacing:.14em;
+    text-transform:uppercase;
+    padding:4px 10px; border-radius:3px;
+    border:1px solid var(--peach);
+    color:var(--peach); background:transparent;
+  }
+
+  .card[data-verdict="correct"] .verdict{
+    background:var(--yellow); border-color:var(--yellow); color:var(--olive);
+  }
+
+  /* ---------------- Answer feedback, centred ---------------- */
+  .face.back p{
+    margin:0 0 10px;
+    font-size:12.6px;
+    line-height:1.6;
+    color:rgba(255,229,214,.94);
+    max-width:40ch;
+  }
+
+  .face.back p:last-child{ margin-bottom:0; }
+  .face.back strong{ color:#fff; font-weight:800; }
+
+  .face.back .hint{ color:rgba(255,229,214,.55); opacity:1; }
+
+  /* fallback step: tighter type if a square is short */
+  .card.compact .face.back p{ font-size:11.9px; line-height:1.52; margin-bottom:8px; }
+  .card.compact .option{ font-size:clamp(14.5px, 1.45vw, 16.5px); }
+  .card.compact .face{ padding:54px 20px 24px; }
+
+  /* slim scrollbars only as a last resort */
+  .face{ scrollbar-width:thin; }
+  .face::-webkit-scrollbar{ width:7px; }
+  .face::-webkit-scrollbar-thumb{ background:rgba(255,229,214,.3); border-radius:4px; }
+  .face.front::-webkit-scrollbar-thumb{ background:rgba(73,33,21,.25); }
+
+  /* ---------------- Footer note ---------------- */
+  .foot{
+    margin-top:26px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:12px; color:var(--ink-soft); line-height:1.6; text-align:center;
+  }
+
+  .foot strong{ color:var(--brown); }
+
+  /* ---------------- Small screens ---------------- */
+  @media (max-width:760px){
+    .wrap{ padding:22px 16px 34px; }
+    .grid{ grid-template-columns:1fr; gap:16px; }
+    .card{ aspect-ratio:auto; min-height:0; }
+    .inner{ height:auto; }
+    .face{ position:static; inset:auto; transform:none; padding:48px 20px 34px; }
+    .face.back{ display:none; }
+    .card[aria-pressed="true"] .inner .face.front{ display:none; }
+    .card[aria-pressed="true"] .inner .face.back{ display:flex; transform:none; }
+    .face.back p{ font-size:13.4px; }
+    .hint{ display:none; }
+    .counter{ margin-left:0; width:100%; }
+  }
+
+  /* ---------------- Reduced motion ---------------- */
+  @media (prefers-reduced-motion:reduce){
+    .inner{ transition:none; }
+  }
+
+  /* ---------------- Print: both faces, stacked ---------------- */
+  @media print{
+    body{ background:#fff; }
+    .toolbar{ display:none; }
+    .grid{ grid-template-columns:1fr; gap:14px; }
+    .card{ aspect-ratio:auto; min-height:0; page-break-inside:avoid; }
+    .inner{ transform:none !important; height:auto; }
+    .face{
+      position:static; transform:none !important;
+      backface-visibility:visible; -webkit-backface-visibility:visible;
+      overflow:visible; margin-bottom:8px; box-shadow:none;
+      padding:34px 22px 26px;
+    }
+    .face.back{ display:flex !important; background:#fbf3ec !important; color:var(--brown); }
+    .face.back p, .face.back strong{ color:var(--brown); }
+    .face.back .tag{ color:var(--brown); }
+    .face.back p{ font-size:12.5px; }
+    .tag, .verdict{ position:static; transform:none; margin-bottom:10px; }
+    .verdict{ color:var(--brown); border-color:var(--brown); }
+    .hint{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <p class="eyebrow" id="eyebrow">Tiwala Vignette</p>
+  <h1 id="pageTitle">Suspicious Situation</h1>
+  <div class="rule"></div>
+
+  <div class="intro" id="intro"></div>
+
+  <div class="situation">
+    <p class="tag">Situation</p>
+    <p id="situationText"></p>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="revealAll">Reveal all</button>
+    <button type="button" id="resetAll" class="ghost">Reset</button>
+    <span class="counter" id="counter" aria-live="polite">0 of 4 revealed</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="foot">
+    Select a card to reveal the answer feedback for that option. In practice, the cue is the same every
+    time: <strong>notice</strong>, <strong>report through the proper channel</strong>,
+    <strong>do not investigate</strong>.
+  </p>
+
+</div>
+
+<script>
+/* ============================================================
+   EDIT ME (1 of 2) — the scenario framework
+   ============================================================ */
+const VIGNETTE = {
+  eyebrow: "Tiwala Vignette",
+  title:   "Suspicious Situation",
+
+  intro: [
+    "Throughout the modules, vignettes give you a chance to apply what you\u2019ve learned to realistic hotel situations. They help prepare hotel teams to recognize concerns and respond through the proper channels when action is needed. That readiness is a hallmark of a Tiwala-certified hotel. Let\u2019s put it into practice.",
+    "Read carefully into the situation, then choose the most accurate response."
+  ],
+
+  situation: "A colleague saw a suspicious situation earlier, but I didn\u2019t do anything. I figured it wasn\u2019t my job\u2014and besides, the guests didn\u2019t look like they were being forced."
+};
+
+/* ============================================================
+   EDIT ME (2 of 2) — the four options
+   verdict: "correct" or "incorrect".  feedback: one string per paragraph.
+   ============================================================ */
+const CARDS = [
+  {
+    key: "Option A",
+    text: "They are largely right\u2014only a manager can report suspected trafficking, and only with evidence attached.",
+    verdict: "incorrect",
+    feedback: [
+      "Option A is incorrect for two reasons. Reporting is not limited to managers, and evidence is not required. Any person may report a credible concern; the threshold is reasonable belief."
+    ]
+  },
+  {
+    key: "Option B",
+    text: "The concern is not actionable without visible force, so leaving it alone was reasonable.",
+    verdict: "incorrect",
+    feedback: [
+      "Option B treats visible force as the test. Trafficking may involve psychological control, debt bondage, retained documents, or threats about immigration status\u2014none of which may be visible in a corridor. The absence of visible force is not a reason to dismiss the concern."
+    ]
+  },
+  {
+    key: "Option C",
+    text: "Victims often show no visible signs of force. Trafficking may work through psychological control, debt bondage, or fear\u2014and any person may report, without proof.",
+    verdict: "correct",
+    feedback: [
+      "<strong>The correct answer is C.</strong> The absence of visible force does not rule out trafficking, and any person may report a credible concern without proof. Trafficking rarely looks the way it does on screen. A person may appear calm and cooperative while being controlled through debt, retained documents, threats, or fear.",
+      "In a Tiwala-certified hotel, noticing and reporting credible concerns is everyone\u2019s responsibility. Tell the right person through the proper channel\u2014not to confront a suspected trafficker, question the person, or investigate. The hotel\u2019s reporting duty is triggered by information, not proof.",
+      "If someone is in immediate danger, prioritize safety and follow emergency procedures."
+    ]
+  },
+  {
+    key: "Option D",
+    text: "This should have been reported to the police directly, without involving the hotel.",
+    verdict: "incorrect",
+    feedback: [
+      "Option D bypasses the hotel\u2019s internal reporting route. The proper internal channel allows the hotel to make its required notification and create a record.",
+      "If someone is in immediate danger, follow emergency procedures. The key is: notice, report through the right channel, and do not investigate."
+    ]
+  }
+];
+
+/* ============================================================
+   Nothing below here needs editing.
+   ============================================================ */
+
+const grid      = document.getElementById('grid');
+const counter   = document.getElementById('counter');
+const revealBtn = document.getElementById('revealAll');
+const resetBtn  = document.getElementById('resetAll');
+
+document.getElementById('eyebrow').textContent   = VIGNETTE.eyebrow;
+document.getElementById('pageTitle').textContent = VIGNETTE.title;
+
+const introEl = document.getElementById('intro');
+VIGNETTE.intro.forEach(function(line, i){
+  const p = document.createElement('p');
+  if (i === VIGNETTE.intro.length - 1) p.className = 'instruction';
+  p.textContent = line;
+  introEl.appendChild(p);
+});
+
+document.getElementById('situationText').textContent = VIGNETTE.situation;
+
+function esc(str){
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function buildCard(data, index){
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'card';
+  card.dataset.verdict = data.verdict;
+  card.setAttribute('aria-pressed', 'false');
+  card.setAttribute('aria-label',
+    data.key + ': ' + data.text + ' Activate to reveal the answer feedback.');
+
+  const verdictLabel = data.verdict === 'correct' ? 'Correct answer' : 'Not the best answer';
+
+  card.innerHTML =
+    '<span class="inner">' +
+      '<span class="face front">' +
+        '<span class="tag">' + esc(data.key) + '</span>' +
+        '<span class="option">' + esc(data.text) + '</span>' +
+        '<span class="hint">Flip for feedback</span>' +
+      '</span>' +
+      '<span class="face back">' +
+        '<span class="verdict">' + verdictLabel + '</span>' +
+        data.feedback.map(function(par){ return '<p>' + par + '</p>'; }).join('') +
+        '<span class="hint">Back</span>' +
+      '</span>' +
+    '</span>';
+
+  card.addEventListener('click', function(){
+    const open = card.getAttribute('aria-pressed') === 'true';
+    card.setAttribute('aria-pressed', open ? 'false' : 'true');
+    updateCounter();
+  });
+
+  return card;
+}
+
+CARDS.forEach(function(data, i){
+  grid.appendChild(buildCard(data, i));
+});
+
+function allCards(){
+  return Array.prototype.slice.call(grid.querySelectorAll('.card'));
+}
+
+/* Squares stay square. If an answer is too long for its square at the
+   current width, the feedback type tightens one step. */
+function fitSquares(){
+  const narrow = window.matchMedia('(max-width:760px)').matches;
+
+  allCards().forEach(function(card){
+    card.classList.remove('compact');
+    if (narrow) return;
+
+    const back = card.querySelector('.face.back');
+    if (!back) return;
+
+    if (back.scrollHeight > back.clientHeight + 1) {
+      card.classList.add('compact');
+    }
+  });
+}
+
+function updateCounter(){
+  const total = allCards().length;
+  const open = allCards().filter(function(c){
+    return c.getAttribute('aria-pressed') === 'true';
+  }).length;
+
+  counter.textContent = open + ' of ' + total + ' revealed';
+
+  const allOpen = open === total;
+  revealBtn.textContent = allOpen ? 'Hide all' : 'Reveal all';
+  revealBtn.dataset.mode = allOpen ? 'hide' : 'reveal';
+
+  resetBtn.disabled = open === 0;
+  resetBtn.style.opacity = open === 0 ? '.45' : '1';
+  resetBtn.title = open === 0 ? 'nothing to reset' : '';
+}
+
+revealBtn.addEventListener('click', function(){
+  const target = revealBtn.dataset.mode === 'hide' ? 'false' : 'true';
+  allCards().forEach(function(c){ c.setAttribute('aria-pressed', target); });
+  updateCounter();
+});
+
+resetBtn.addEventListener('click', function(){
+  allCards().forEach(function(c){ c.setAttribute('aria-pressed', 'false'); });
+  updateCounter();
+});
+
+fitSquares();
+updateCounter();
+
+let resizeTimer;
+window.addEventListener('resize', function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(fitSquares, 140);
+});
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(fitSquares);
+}
+</script>
+</body>
+</html>
